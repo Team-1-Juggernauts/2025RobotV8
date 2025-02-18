@@ -29,6 +29,7 @@ import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.GripperSubsystem;
 import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.ShoulderSubsystem;
+import frc.robot.subsystems.WristSubsystem;
 import frc.robot.subsystems.PhotonVisionSubsystem;
 import frc.robot.subsystems.CANdleSubsystem;
 import frc.robot.subsystems.Analog0Subsystem;
@@ -36,6 +37,7 @@ import frc.robot.subsystems.Analog0Subsystem;
 import frc.robot.commands.ClimbStickCommand;
 import frc.robot.commands.ShoulderAngleCommand;
 import frc.robot.commands.ShoulderJoyStickCommand;
+import frc.robot.commands.WristFixedLocationCommand;
 import frc.robot.commands.ElevatorFixedLocationCommand;
 import frc.robot.commands.GripperCommand;
 import frc.robot.commands.AutoScoreCoralLowArmCommand;
@@ -45,7 +47,6 @@ import frc.robot.commands.AutoLoadCoralCommand;
 
 import frc.robot.commands.CANdle_Yellow_Command;
 import frc.robot.commands.CANdle_Solid_White_Animation;
-import frc.robot.commands.CANdle_YellowFast_Command;
 import frc.robot.commands.CANdle_Green_Command;
 import frc.robot.commands.CANdle_Red_Command;
 
@@ -72,11 +73,7 @@ public class RobotContainer
 
    public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
-    double   GripperPowerIn      = 0.3;   
-    double   GripperPowerOut      = -0.3;    
-    //private boolean isAnalogActivated = false; 
-    double GripperAutoSecondsToRun = 2.0;
-    double Gripper_ArmAutoSecondsToRun = 3.0;
+    ;
     
     double ElevatorPosHigh = 100.0;  
     double ElevatorPosMid  = 20.0; 
@@ -87,14 +84,28 @@ public class RobotContainer
     double ShoulderMed  = 20.00;
     double ShoulderHome = 1.0;
     double shoulderTolerance = 2.0;
-   
+
+
+    double WristLoadPosition = 0.0;
+    double WristScorePosition = 90;
+    double WristTolerance = 2.0;
+    double WristHome = 1.0;
+
+    double   GripperPowerIn      = 0.3;   
+    double   GripperPowerOut      = -0.3;    
+    //private boolean isAnalogActivated = false; 
+    double GripperAutoSecondsToRun = 2.0;
+    double Gripper_ArmAutoSecondsToRun = 3.0;
+
     private final   CANdleSubsystem       m_Candle           = new CANdleSubsystem();
     private final   ClimbSubsystem        ClimbSubsystem     = new ClimbSubsystem();
     private final   ShoulderSubsystem     ShoulderSubsystem  = new ShoulderSubsystem();
     private final   PhotonVisionSubsystem photonVisionSubsystem  = new PhotonVisionSubsystem("Team_1", new Transform3d());
     private final   Analog0Subsystem      Analog0Subsystem   = new Analog0Subsystem ();  
     public  final   ElevatorSubsystem     ElevatorSubsystem   = new ElevatorSubsystem(); 
+    public  final   WristSubsystem       WristSubsystem      = new WristSubsystem();
     public final    GripperSubsystem      GripperSubsystem    = new GripperSubsystem(); 
+
     
     private static final Command ClimbStickCommand = null;    
    
@@ -183,8 +194,6 @@ public class RobotContainer
 
    UpperController.rightTrigger()
                                     .whileTrue(new CANdle_Red_Command(m_Candle));
-
-       
    
    /****************************************************************/
    //                         Elevator fixed position
@@ -206,17 +215,17 @@ public class RobotContainer
  //                      Shoulder Fixed position
  //*******************************************************************/
    
-     UpperController
-     .b()
-    .onTrue(new ShoulderAngleCommand(ShoulderSubsystem, ShoulderHome, shoulderTolerance));  
-
-    UpperController
+ UpperController
     .y()
     .onTrue(new ShoulderAngleCommand(ShoulderSubsystem, ShoulderHigh, shoulderTolerance)); 
     
-    UpperController
+ UpperController
     .x()
     .onTrue(new ShoulderAngleCommand(ShoulderSubsystem, ShoulderMed, shoulderTolerance)); 
+
+ UpperController
+    .b()
+   .onTrue(new ShoulderAngleCommand(ShoulderSubsystem, ShoulderHome, shoulderTolerance));  
 
  //******************************************************************/
  //                                Shoulder Joystick
@@ -226,14 +235,29 @@ public class RobotContainer
                                      () -> MathUtil.applyDeadband(UpperController.getLeftY(), 0.01) ));
 
 //*****************************************************************/
-//GripperForward (Load)
+//                            Wrist to Score Reef position 
+//******************************************************************/
+
+    new Trigger(() -> UpperController.getLeftTriggerAxis() >0.5)
+        .onTrue( new WristFixedLocationCommand( WristSubsystem, WristScorePosition, WristTolerance));
+                 
+//*****************************************************************/
+//                         Wrist to Player Load position
+//******************************************************************/
+
+UpperController.leftBumper()
+.onTrue(new WristFixedLocationCommand(WristSubsystem, WristLoadPosition, WristTolerance));
+
+ 
+//*****************************************************************/
+//                        GripperForward (Load)
 //******************************************************************/
 
     new Trigger(() -> UpperController.getRightTriggerAxis() >0.5)
         .whileTrue( new GripperCommand( GripperSubsystem,GripperPowerOut));
                  
 //*****************************************************************/
-//GripperReverse (Score)
+//                         GripperReverse (Score)
 //******************************************************************/
 
 UpperController.rightBumper()

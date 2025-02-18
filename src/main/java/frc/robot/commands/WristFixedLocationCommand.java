@@ -6,40 +6,40 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.ElevatorSubsystem;
+import frc.robot.subsystems.WristSubsystem;
 
-public class ElevatorFixedLocationCommand extends Command 
+public class WristFixedLocationCommand extends Command 
 {
   
-  private final ElevatorSubsystem elevatorSubsystem;
+  private final WristSubsystem wristSubsystem;
   private final double  distance;
-  private final double elevatorTolerance;
+  private final double wristTolerance;
  
-  public ElevatorFixedLocationCommand(ElevatorSubsystem elevator, Double distance, Double elevatorTolerance) 
+  public WristFixedLocationCommand(WristSubsystem wrist, Double distance, Double wristTolerance) 
   {
-    this.elevatorSubsystem = elevator;
+    this.wristSubsystem = wrist;
     this.distance = distance;        
-    this.elevatorTolerance = elevatorTolerance;
-    addRequirements(elevator);
+    this.wristTolerance = wristTolerance;
+    addRequirements(wrist);
   }
 
   @Override
   public void initialize() 
   {
-    elevatorSubsystem.setElevatorBrake();         
+    wristSubsystem.setWristBrake();         
   }
 
   @Override
   public void execute() 
   {          
-    elevatorSubsystem.setElevatorPosition(distance);
-    SmartDashboard.putNumber("Elevator Tolerance", elevatorTolerance);
+    wristSubsystem.setWristPosition(distance);
+    SmartDashboard.putNumber("Wrist Tolerance", wristTolerance);
   }
 
   @Override
   public void end(boolean interrupted) 
   {    
-    elevatorSubsystem.setElevatorCoast();  
+    wristSubsystem.setWristCoast();  
   }
 
   // Returns true when the command should end.
@@ -47,9 +47,9 @@ public class ElevatorFixedLocationCommand extends Command
   public boolean isFinished() 
   {
     
-    double error = Math.abs(elevatorSubsystem.getPosition() - distance);
+    double error = Math.abs(wristSubsystem.getPosition() - distance);
     System.out.println("Checking isFinished(): Error = " + error);
-    return error < elevatorTolerance;
+    return error < wristTolerance;
 
     }
   }

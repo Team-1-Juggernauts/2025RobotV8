@@ -30,9 +30,7 @@ import java.io.IOException;
   public TalonFXConfiguration configs = new TalonFXConfiguration();
   public CANcoderConfiguration cc_cfg = new CANcoderConfiguration();
   public TalonFXConfiguration fx_cfg = new TalonFXConfiguration();
-
-  private FileWriter logFile;
-        
+    
   public  ShoulderSubsystem()
   {
 
@@ -49,39 +47,23 @@ m_shoulder.getConfigurator().apply(fx_cfg);
 
 m_shoulder.setNeutralMode(NeutralModeValue.Brake);
 
-var slot0Configs = new Slot0Configs();
-    
-    slot0Configs.kP = kP; // An error of 1 rps results in 0.11 V output
-    slot0Configs.kI = kI; 
-    slot0Configs.kD = kD; 
-    slot0Configs.kS = kS; // Add 0.1 V output to overcome static friction
-    slot0Configs.kV = kV; // A velocity target of 1 rps results in 0.12 V output
-m_shoulder.getConfigurator().apply(slot0Configs);
-
 configs.Voltage.PeakForwardVoltage = 8;
 configs.Voltage.PeakReverseVoltage = -8;
 configs.TorqueCurrent.PeakForwardTorqueCurrent = 40;
 configs.TorqueCurrent.PeakReverseTorqueCurrent = -40;
 m_shoulder.getConfigurator().apply(configs);
 
-initLogFile();
+ // Configure the TalonFX for position control (PID)
+ var slot0Configs = new Slot0Configs();
+ slot0Configs.kP = kP;
+ slot0Configs.kI = kI;
+ slot0Configs.kD = kD;
+ slot0Configs.kS = kS;
+ slot0Configs.kV = kV;
+ m_shoulder.getConfigurator().apply(slot0Configs);
 
  }
    
- private void initLogFile()
-     {
-       try
-       {
-        logFile = new FileWriter("/home/lvuser/shoulder_log.csv");
-        logFile.append("Timestamp,Position,Stator Current,kP,kI,kD,kV,kS,SetPoint,\n");
-       } 
-
-        catch (IOException e) 
-          {
-          System.out.println("Error initializing log file: " + e.getMessage());
-          }
-  }
-
 
  public void setShoulderPosition(double positionSetPoint)
    {
@@ -120,31 +102,9 @@ initLogFile();
     SmartDashboard.putNumber("Shoulder CANCoder position", m_cc.getAbsolutePosition().getValueAsDouble()); 
     SmartDashboard.putNumber("Shoulder position", position); 
     SmartDashboard.putNumber("Shoulder Set Point", positionSetPoint);
-    SmartDashboard.putNumber("Elevator Stator Current", statorCurrent);
-  
-    logData(position, statorCurrent);
+    SmartDashboard.putNumber("Shoulder Stator Current", statorCurrent);
   
   }
 
-  private void logData(double position, double current) 
-  {
-    try {
-        long timestamp = System.currentTimeMillis();
-        logFile.append(timestamp + "," + position + "," + current + "," + kP + "," + kI + "," + kD + "," + kV + "," + kS +  "," + positionSetPoint + "\n");
-        logFile.flush();
-    } catch (IOException e) {
-        System.out.println("Error writing to log file: " + e.getMessage());
-    }
- }
-
-public void closeLogFile() 
-  {
-    try {
-        if (logFile != null) {
-            logFile.close();
-        }
-    } catch (IOException e) {
-        System.out.println("Error closing log file: " + e.getMessage());
-    }
-  }
+ 
 }
