@@ -42,6 +42,7 @@ import frc.robot.commands.ElevatorFixedLocationCommand;
 import frc.robot.commands.GripperCommand;
 import frc.robot.commands.AutoScoreCoralLowArmCommand;
 import frc.robot.commands.AutoScoreCoralLowCommand;
+import frc.robot.commands.CANdle_Blue_Command;
 import frc.robot.commands.AutoLoadCoralCommand;
 import frc.robot.commands.AimAtTagCommand;
 
@@ -189,10 +190,10 @@ public class RobotContainer
     //*****************************************************************/
 
     new Trigger(() -> joystick.getRightTriggerAxis() > 0.5)
-            .whileTrue(AimAtTagCommand.create(drivetrain, vision));
+                .whileTrue(AimAtTagCommand.create(drivetrain, vision));
 
        joystick.rightTrigger()
-                                    .whileTrue(new CANdle_Red_Command(m_Candle));
+                          .whileTrue(new CANdle_Red_Command(m_Candle));
    
    /****************************************************************/
    //                         Elevator fixed position
@@ -255,7 +256,8 @@ UpperController.leftBumper()
     new Trigger(() -> UpperController.getRightTriggerAxis() >0.5)
         .whileTrue( new GripperCommand( GripperSubsystem,GripperPowerOut));
 
-  
+    new  Trigger(() -> UpperController.getRightTriggerAxis() >0.5)
+        .whileTrue( new CANdle_Blue_Command(m_Candle));
                  
 //*****************************************************************/
 //                         GripperReverse (Score)
@@ -272,10 +274,17 @@ UpperController.rightBumper()
     //*****************************************************************/
     UpperController.rightStick()
     .onTrue(new ClimbStickCommand(ClimbSubsystem,
-                                     () -> MathUtil.applyDeadband(UpperController.getRightY(), 0.01) ));
+                                     () -> MathUtil.applyDeadband(-UpperController.getRightY(), 0.01) ));
 
-     UpperController.rightStick()
+    new  Trigger(() -> UpperController.getLeftY() >0.5) 
                                 .whileTrue(new CANdle_Green_Command(m_Candle));
+
+     new  Trigger(() -> UpperController.getLeftY() >0.5)
+                                .whileTrue( new CANdle_Blue_Command(m_Candle));
+
+                                
+
+
                              
 
 }

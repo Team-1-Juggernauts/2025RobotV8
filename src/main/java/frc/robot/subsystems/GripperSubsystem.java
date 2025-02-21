@@ -14,13 +14,17 @@ public class GripperSubsystem extends SubsystemBase
 {
    
 final TalonFX _GripperTalonFX = new TalonFX(25);
+final TalonFX _GripperTalonFX2 = new TalonFX(26);
     
 	 
 public GripperSubsystem() 
   {
     configureMotor();
     _GripperTalonFX.setNeutralMode(NeutralModeValue.Brake);
-              
+    _GripperTalonFX2.setNeutralMode(NeutralModeValue.Brake);  
+    _GripperTalonFX2.setControl(new com.ctre.phoenix6.controls.Follower(15, true));
+    
+            
    }
   
 public void configureMotor()
@@ -29,6 +33,9 @@ public void configureMotor()
      currentLimits.StatorCurrentLimit = 20;
      currentLimits.StatorCurrentLimitEnable = true;     
      _GripperTalonFX.getConfigurator().apply(currentLimits);
+     _GripperTalonFX2.getConfigurator().apply(currentLimits);
+
+
   }
 
 public void setGripperSpeed(double speed)
@@ -48,6 +55,6 @@ public double getStatorCurrent()
   public void periodic() 
   {
     SmartDashboard.putNumber("Gripper Out Percent", _GripperTalonFX.getDutyCycle().getValueAsDouble());
-    SmartDashboard.putNumber("Gripper Current", _GripperTalonFX.getSupplyCurrent().getValueAsDouble());
+    SmartDashboard.putNumber("Gripper Stator Current", _GripperTalonFX.getStatorCurrent().getValueAsDouble());
   }
 }

@@ -51,8 +51,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private static final double kSimLoopPeriod = 0.005; // 5 ms
     private Notifier m_simNotifier = null;
     private double m_lastSimTime;
-    public double pigeonYaw;
-
+   
   //private final PhotonVisionSubsystem PhotonVisionSubsystem = new PhotonVisionSubsystem(null, null);
   //double lastTimeStamp = Timer.getFPGATimestamp();  
 //   double   errorSumDistance = 0;
@@ -283,13 +282,15 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     @Override
     public void periodic()        
     {    
-       pigeonYaw = m_Pigeon2.getRotation2d().getDegrees();
-       SmartDashboard.putNumber("RAW Pigeon Yaw", pigeonYaw);
-       pigeonYaw = ((pigeonYaw + 180) % 360 + 360) % 360 - 180;
-       SmartDashboard.putNumber("Pigeon Yaw", pigeonYaw);
-      
-      
-        if (!m_hasAppliedOperatorPerspective || DriverStation.isDisabled()) 
+       
+ double rawYaw = m_Pigeon2.getYaw().getValueAsDouble();
+ SmartDashboard.putNumber("RAW Pigeon Yaw", rawYaw);
+
+ double normalizedYaw = ((rawYaw + 180) % 360 + 360) % 360 - 180;
+ SmartDashboard.putNumber("Pigeon Yaw", normalizedYaw);
+
+
+       if (!m_hasAppliedOperatorPerspective || DriverStation.isDisabled()) 
         {
             DriverStation.getAlliance().ifPresent(allianceColor -> {
                 setOperatorPerspectiveForward(
@@ -300,8 +301,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 m_hasAppliedOperatorPerspective = true;
             });
         }
-
-   
     }
 
     private void startSimThread() {
