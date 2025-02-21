@@ -2,7 +2,7 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.hardware.CANrange;
-
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.PositionVoltage;
@@ -37,9 +37,17 @@ public class WristSubsystem extends SubsystemBase
         var configs = new TalonFXConfiguration();
         configs.Voltage.PeakForwardVoltage = 4;
         configs.Voltage.PeakReverseVoltage = -4;
-        configs.TorqueCurrent.PeakForwardTorqueCurrent = 40;
-        configs.TorqueCurrent.PeakReverseTorqueCurrent = -40;
+        configs.TorqueCurrent.PeakForwardTorqueCurrent = 20;
+        configs.TorqueCurrent.PeakReverseTorqueCurrent = -20;
         m_wrist.getConfigurator().apply(configs);
+
+  var talonFXConfigurator = m_wrist.getConfigurator();        
+        var limitConfigs = new CurrentLimitsConfigs();
+          limitConfigs.StatorCurrentLimit = 20;
+          limitConfigs.StatorCurrentLimitEnable = true;
+          talonFXConfigurator.apply(limitConfigs);
+
+
       
         var slot0Configs = new Slot0Configs();
         slot0Configs.kP = kP;

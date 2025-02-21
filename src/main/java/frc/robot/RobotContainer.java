@@ -30,7 +30,7 @@ import frc.robot.subsystems.GripperSubsystem;
 import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.ShoulderSubsystem;
 import frc.robot.subsystems.WristSubsystem;
-import frc.robot.subsystems.PhotonVisionSubsystem;
+import frc.robot.subsystems.VisionSubsystem;
 import frc.robot.subsystems.CANdleSubsystem;
 import frc.robot.subsystems.Analog0Subsystem;
 
@@ -42,8 +42,8 @@ import frc.robot.commands.ElevatorFixedLocationCommand;
 import frc.robot.commands.GripperCommand;
 import frc.robot.commands.AutoScoreCoralLowArmCommand;
 import frc.robot.commands.AutoScoreCoralLowCommand;
-import frc.robot.commands.AlignWithTargetCommand;
 import frc.robot.commands.AutoLoadCoralCommand;
+import frc.robot.commands.AimAtTagCommand;
 
 import frc.robot.commands.CANdle_Yellow_Command;
 import frc.robot.commands.CANdle_Solid_White_Animation;
@@ -69,11 +69,10 @@ public class RobotContainer
 
     private final CommandXboxController joystick = new CommandXboxController(0);
     private final CommandXboxController UpperController = new CommandXboxController(1);
-   // private final PhotonCamera camera = new PhotonCamera("Team_1"); 
+    private final PhotonCamera camera = new PhotonCamera("FrontCenter"); 
 
    public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
-
-    ;
+   private final VisionSubsystem vision = new VisionSubsystem("FrontCenter");
     
     double ElevatorPosHigh = 100.0;  
     double ElevatorPosMid  = 20.0; 
@@ -100,7 +99,7 @@ public class RobotContainer
     private final   CANdleSubsystem       m_Candle           = new CANdleSubsystem();
     private final   ClimbSubsystem        ClimbSubsystem     = new ClimbSubsystem();
     private final   ShoulderSubsystem     ShoulderSubsystem  = new ShoulderSubsystem();
-    private final   PhotonVisionSubsystem photonVisionSubsystem  = new PhotonVisionSubsystem("Team_1", new Transform3d());
+    //private final   VisionSubsystem photonVisionSubsystem  = new PhotonVisionSubsystem("Team_1", new Transform3d());
     private final   Analog0Subsystem      Analog0Subsystem   = new Analog0Subsystem ();  
     public  final   ElevatorSubsystem     ElevatorSubsystem   = new ElevatorSubsystem(); 
     public  final   WristSubsystem       WristSubsystem      = new WristSubsystem();
@@ -151,9 +150,9 @@ public class RobotContainer
          )
         );
 
-        SmartDashboard.putNumber("Vision Target Yaw", photonVisionSubsystem.getAngleToBestTarget());
-        SmartDashboard.putNumber("Vision Target Distance", photonVisionSubsystem.getDistanceToBestTarget());
-        SmartDashboard.putBoolean("Has Vision Target", photonVisionSubsystem.hasTargets());
+       // SmartDashboard.putNumber("Vision Target Yaw", photonVisionSubsystem.getAngleToBestTarget());
+       //SmartDashboard.putNumber("Vision Target Distance", photonVisionSubsystem.getDistanceToBestTarget());
+        //SmartDashboard.putBoolean("Has Vision Target", photonVisionSubsystem.hasTargets());
 
         joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
         joystick.b().whileTrue(drivetrain.applyRequest(() ->
@@ -189,10 +188,10 @@ public class RobotContainer
     //                      PhotonVision Aim at Reef Target
     //*****************************************************************/
 
-    UpperController.rightTrigger()
-                                     .whileTrue(new AlignWithTargetCommand(photonVisionSubsystem));
+    new Trigger(() -> joystick.getRightTriggerAxis() > 0.5)
+            .whileTrue(AimAtTagCommand.create(drivetrain, vision));
 
-   UpperController.rightTrigger()
+       joystick.rightTrigger()
                                     .whileTrue(new CANdle_Red_Command(m_Candle));
    
    /****************************************************************/
@@ -255,6 +254,8 @@ UpperController.leftBumper()
 
     new Trigger(() -> UpperController.getRightTriggerAxis() >0.5)
         .whileTrue( new GripperCommand( GripperSubsystem,GripperPowerOut));
+
+  
                  
 //*****************************************************************/
 //                         GripperReverse (Score)
@@ -263,7 +264,7 @@ UpperController.leftBumper()
 UpperController.rightBumper()
 .whileTrue(new GripperCommand(GripperSubsystem, GripperPowerIn));
 
- UpperController.leftBumper()
+ UpperController.rightBumper()
                    .whileTrue(new CANdle_Solid_White_Animation(m_Candle));
 
  //******************************************************************/
@@ -274,7 +275,7 @@ UpperController.rightBumper()
                                      () -> MathUtil.applyDeadband(UpperController.getRightY(), 0.01) ));
 
      UpperController.rightStick()
-                                .onTrue(new CANdle_Green_Command(m_Candle));
+                                .whileTrue(new CANdle_Green_Command(m_Candle));
                              
 
 }

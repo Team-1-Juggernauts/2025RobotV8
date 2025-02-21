@@ -10,7 +10,7 @@ import frc.robot.subsystems.ClimbSubsystem;
 
 public class ClimbStickCommand extends Command
 {
-  private double speedlimit=0.7;
+  private double speedlimit=1.0;
   private final ClimbSubsystem ClimbSubsystem;
   private final Supplier<Double> speedFunction;
              

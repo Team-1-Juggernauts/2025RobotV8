@@ -51,47 +51,47 @@ public class CANdleSubsystem extends SubsystemBase
   
   public void CANdle_Yellow() 
   {  
-    m_toAnimate = new StrobeAnimation(255, 255, 0, 0, 0.3, LedCount, 0);
+    m_toAnimate = new StrobeAnimation(100, 100, 0, 0, 1.0, LedCount, 0);
   }
 
   public void CANdle_Fast_Yellow() 
   {  
-    m_toAnimate = new StrobeAnimation(255, 255, 0, 0, 0.1, LedCount, 0);
+    m_toAnimate = new StrobeAnimation(100, 100, 0, 0, 0.1, LedCount, 0);
   }
 
   public void CANdle_Orange() 
   {  
-    m_toAnimate = new StrobeAnimation(255, 40 , 0, 0, 1, LedCount, 0);
+    m_toAnimate = new StrobeAnimation(150, 25 , 0, 0, 1, LedCount, 0);
   }
 
    public void CANdle_Default() 
   {  
-    m_toAnimate = new StrobeAnimation(255, 255, 0, 0, 1.0, LedCount, 0);
-    // m_toAnimate = new RainbowAnimation(1.0, 0.1, LedCount, false, 0);
+    m_toAnimate = new StrobeAnimation(100, 100, 0, 0, 1.0, LedCount, 0);
+    
   }
 
   public void CANdle_Rainbow() 
   {  
-    m_toAnimate = new RainbowAnimation(1.0, 1.0, LedCount, false, 0);
+    m_toAnimate = new RainbowAnimation(0.5, 0.5, LedCount, false, 0);
   }
 
   public void CANdle_Solid_Green() 
   {  
-    m_toAnimate = new StrobeAnimation(255, 255, 0, 0, 1.0, LedCount, 0);
+    m_toAnimate = new StrobeAnimation(0, 100, 0, 0, 1.0, LedCount, 0);
   }
   public void CANdle_Red() 
   {  
-    m_toAnimate = new StrobeAnimation(150, 0, 0, 0, 0.5, LedCount, 0);
+    m_toAnimate = new StrobeAnimation(120, 0, 0, 0, 0.5, LedCount, 0);
   }
 
   public void CANdle_Blue() 
   {  
-    m_toAnimate = new StrobeAnimation(0, 0, 100, 0, 1, LedCount, 0);
+    m_toAnimate = new StrobeAnimation(0, 0, 120, 0, 1, LedCount, 0);
   }
 
   public void CANdle_Yellow_Larson() 
   {  
-    m_toAnimate = new LarsonAnimation(255, 255, 0, 0, 1.0, LedCount, BounceMode.Front, 7, 0);
+    m_toAnimate = new LarsonAnimation(100, 100, 0, 0, 1.0, LedCount, BounceMode.Front, 7, 0);
   }
 
   public void CANdle_Fire_Animation() 
@@ -100,7 +100,7 @@ public class CANdleSubsystem extends SubsystemBase
   }
   public void CANdle_Solid_White() 
   {  
-    m_toAnimate = new StrobeAnimation(200, 200, 200, 100, 0.5, LedCount, 0);
+    m_toAnimate = new StrobeAnimation(100, 100, 100, 100, 1.0, LedCount, 0);
   }
 
     @Override

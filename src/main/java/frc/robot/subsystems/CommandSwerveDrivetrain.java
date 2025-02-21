@@ -12,6 +12,7 @@ import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ctre.phoenix6.signals.*;
@@ -317,4 +318,17 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         });
         m_simNotifier.startPeriodic(kSimLoopPeriod);
     }
+
+    public void drive(double xSpeed, double ySpeed, double rotSpeed) {
+        SwerveRequest.ApplyRobotSpeeds driveRequest = new SwerveRequest.ApplyRobotSpeeds();
+        ChassisSpeeds speeds = new ChassisSpeeds(xSpeed, ySpeed, rotSpeed); // Create ChassisSpeeds object
+        setControl(driveRequest.withSpeeds(speeds)); // Pass ChassisSpeeds object
+    }
+
+    public void stop() {
+        SwerveRequest.ApplyRobotSpeeds stopRequest = new SwerveRequest.ApplyRobotSpeeds();
+        ChassisSpeeds stopSpeeds = new ChassisSpeeds(0, 0, 0); // All speeds set to zero
+        setControl(stopRequest.withSpeeds(stopSpeeds)); // Apply zero speeds
+    }
+
 }

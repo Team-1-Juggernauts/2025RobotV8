@@ -2,7 +2,7 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.hardware.CANrange;
-
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.PositionVoltage;
@@ -22,49 +22,54 @@ public class ElevatorSubsystem extends SubsystemBase {
     
 
 // PID constants
-    private double kP = 2.4;  // Proportional gain
+    private double kP = 2.0;  // Proportional gain
     private double kI = 0;  // Integral gain
-    private double kD = 0.1;  // Derivative gain
-    private double kS = 0.25;  // Static friction compensation
-    private double kV = 0.12;  // Velocity term for overcoming friction
+    private double kD = 0.2;  // Derivative gain
+    private double kS = 0.1;  // Static friction compensation
+    private double kV = 0.1;  // Velocity term for overcoming friction
 
-    private double elevHomePos = 2.0;  //this is the home position for CANRange
-    private final double resetThreshold = 10.0;  //this is the home position tolerance
     private double positionSetPoint = 0.0;
-    private double elevPos;
-
+    
     public ElevatorSubsystem() {
         // Set neutral mode for the elevator motors
         m_elevator.setNeutralMode(NeutralModeValue.Brake);
         m_elevator2.setNeutralMode(NeutralModeValue.Brake);
+        m_elevator.setPosition(0);    
 
         var configs = new TalonFXConfiguration();
-        configs.Voltage.PeakForwardVoltage = 8;
-        configs.Voltage.PeakReverseVoltage = -8;
+        configs.Voltage.PeakForwardVoltage = 6;
+        configs.Voltage.PeakReverseVoltage = -6;
         configs.TorqueCurrent.PeakForwardTorqueCurrent = 40;
         configs.TorqueCurrent.PeakReverseTorqueCurrent = -40;
         m_elevator.getConfigurator().apply(configs);
         m_elevator2.getConfigurator().apply(configs);
 
+        var talonFXConfigurator = m_elevator.getConfigurator();        
+        var limitConfigs = new CurrentLimitsConfigs();
+          limitConfigs.StatorCurrentLimit = 50;
+          limitConfigs.StatorCurrentLimitEnable = true;
+          talonFXConfigurator.apply(limitConfigs);
+
+        var talonFXConfigurator2 = m_elevator2.getConfigurator();
+        var limitConfigs2 = new CurrentLimitsConfigs();
+            limitConfigs2.StatorCurrentLimit = 50;
+            limitConfigs2.StatorCurrentLimitEnable = true;
+            talonFXConfigurator2.apply(limitConfigs2);
 
         // Configure the TalonFX for position control (PID)
         var slot0Configs = new Slot0Configs();
         slot0Configs.kP = kP;
-        slot0Configs.kI = kI;
+        slot0Configs.kI  = kI;
         slot0Configs.kD = kD;
         slot0Configs.kS = kS;
         slot0Configs.kV = kV;
         m_elevator.getConfigurator().apply(slot0Configs);
         m_elevator2.getConfigurator().apply(slot0Configs);
 
-      
-
-        // Set the second motor to follow the first motor (manual follower control)
-        m_elevator2.setControl(new com.ctre.phoenix6.controls.Follower(15, true)); // Follower motor
+         m_elevator2.setControl(new com.ctre.phoenix6.controls.Follower(15, true)); // Follower motor
     }
 
-    // Method to set the elevator position
-    public void setElevatorPosition(double positionSetPoint) 
+        public void setElevatorPosition(double positionSetPoint) 
     {
         this.positionSetPoint = positionSetPoint;
         PositionVoltage request = new PositionVoltage(positionSetPoint).withSlot(0);
@@ -85,20 +90,15 @@ public class ElevatorSubsystem extends SubsystemBase {
         m_elevator2.setNeutralMode(NeutralModeValue.Coast);
     }
 
-    public void ResetElevatorIfAtBottom()
-    {
-    elevPos = range.getDistance().getValueAsDouble() * 1000.0;
-    if (elevPos <= resetThreshold)
-        {
-          m_elevator.setPosition(0.0);
-          positionSetPoint = 0.0;
-        }
-    }
-
     @Override
     public void periodic() {
 
-     ResetElevatorIfAtBottom();
+        if(!DIO.get())
+        {
+          m_elevator.setPosition(0);
+          positionSetPoint = 0; 
+        }
+    
 
         
         SmartDashboard.putNumber("Elevator Position", m_elevator.getPosition().getValueAsDouble());
@@ -107,9 +107,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 
         double statorCurrent = m_elevator.getStatorCurrent().getValueAsDouble();   
         SmartDashboard.putNumber("Elevator Stator Current", statorCurrent);   
-        
-        SmartDashboard.putNumber("Elevator CANRange Pos", elevPos);
-        SmartDashboard.putNumber("Elevator Range Threshhold", resetThreshold);
+        SmartDashboard.putBoolean("Elevator DIO",  DIO.get());
         
     }
 }

@@ -2,6 +2,7 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
@@ -12,8 +13,6 @@ import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import java.io.FileWriter;
-import java.io.IOException;
 
  public class ShoulderSubsystem extends SubsystemBase 
 {
@@ -53,6 +52,16 @@ configs.TorqueCurrent.PeakForwardTorqueCurrent = 40;
 configs.TorqueCurrent.PeakReverseTorqueCurrent = -40;
 m_shoulder.getConfigurator().apply(configs);
 
+
+ var talonFXConfigurator = m_shoulder.getConfigurator();        
+        var limitConfigs = new CurrentLimitsConfigs();
+          limitConfigs.StatorCurrentLimit = 50;
+          limitConfigs.StatorCurrentLimitEnable = true;
+          talonFXConfigurator.apply(limitConfigs);
+
+
+
+
  // Configure the TalonFX for position control (PID)
  var slot0Configs = new Slot0Configs();
  slot0Configs.kP = kP;
@@ -61,7 +70,8 @@ m_shoulder.getConfigurator().apply(configs);
  slot0Configs.kS = kS;
  slot0Configs.kV = kV;
  m_shoulder.getConfigurator().apply(slot0Configs);
-
+ 
+ 
  }
    
 
