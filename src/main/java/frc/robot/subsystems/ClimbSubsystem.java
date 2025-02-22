@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class ClimbSubsystem extends SubsystemBase 
 {
   
-  final TalonFX _ClimberTalonFX = new TalonFX(35);
+  final TalonFX _ClimberTalonFX = new TalonFX(35,"Chassis CAN");
   final DutyCycleOut m_leftRequest = new DutyCycleOut(0.0);    
  
   public ClimbSubsystem() 
