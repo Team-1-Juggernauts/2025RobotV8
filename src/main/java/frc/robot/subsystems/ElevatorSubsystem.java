@@ -1,7 +1,6 @@
 
 package frc.robot.subsystems;
 
-import com.ctre.phoenix6.hardware.CANrange;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -17,7 +16,6 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     private final TalonFX m_elevator = new TalonFX(15);  // Main elevator motor
     private final TalonFX m_elevator2 = new TalonFX(16);  // Follower motor
-    private final CANrange range = new CANrange(17);
     private final DigitalInput DIO = new DigitalInput(0);  // Limit switch
     private final PositionVoltage positionControl = new PositionVoltage(0);
     

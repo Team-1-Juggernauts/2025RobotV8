@@ -22,8 +22,6 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.generated.TunerConstants;
 import edu.wpi.first.math.MathUtil;
 
-import org.photonvision.PhotonCamera;
-
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.GripperSubsystem;
@@ -75,9 +73,7 @@ public class RobotContainer
 
     private final CommandXboxController joystick = new CommandXboxController(0);
     private final CommandXboxController UpperController = new CommandXboxController(1);
-    private final PhotonCamera camera = new PhotonCamera("FrontCenter"); 
-
-  
+   
     
     double ElevatorPosHigh = 100.0;  
     double ElevatorPosMid  = 20.0; 
@@ -97,21 +93,21 @@ public class RobotContainer
 
     double   GripperPowerIn      = 0.3;   
     double   GripperPowerOut      = -0.3;    
-    //private boolean isAnalogActivated = false; 
+    private boolean isAnalogActivated = false; 
     double GripperAutoSecondsToRun = 2.0;
     double Gripper_ArmAutoSecondsToRun = 3.0;
 
-    private final   CANdleSubsystem       m_Candle           = new CANdleSubsystem();
-    private final   ClimbSubsystem        ClimbSubsystem     = new ClimbSubsystem();
-    private final   ShoulderSubsystem     ShoulderSubsystem  = new ShoulderSubsystem();
-   // private final   VisionSubsystem photonVisionSubsystem  = new PhotonVisionSubsystem("Team_1", new Transform3d());
-    private final   Analog0Subsystem      Analog0Subsystem   = new Analog0Subsystem ();  
-    public  final   ElevatorSubsystem     ElevatorSubsystem   = new ElevatorSubsystem(); 
-    public  final   WristSubsystem       WristSubsystem      = new WristSubsystem();
-    public final    GripperSubsystem      GripperSubsystem    = new GripperSubsystem(); 
-    public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
-    private final VisionSubsystem VisionSubsystem = new VisionSubsystem("FrontCenter");
-
+    private final   CANdleSubsystem       m_Candle               = new CANdleSubsystem();
+    private final   ClimbSubsystem        ClimbSubsystem         = new ClimbSubsystem();
+    private final   ShoulderSubsystem     ShoulderSubsystem      = new ShoulderSubsystem();   
+    private final   Analog0Subsystem      Analog0Subsystem       = new Analog0Subsystem ();  
+    public  final   ElevatorSubsystem     ElevatorSubsystem      = new ElevatorSubsystem(); 
+    public  final   WristSubsystem        WristSubsystem         = new WristSubsystem();
+    public final    GripperSubsystem      GripperSubsystem       = new GripperSubsystem(); 
+    public final    CommandSwerveDrivetrain  drivetrain          = TunerConstants.createDrivetrain();
+    private final   VisionSubsystem         VisionSubsystem      = new VisionSubsystem("FrontCenter");
+ // private final   PhotonCamera            camera               = new PhotonCamera("FrontCenter"); 
+ // private final   VisionSubsystem       photonVisionSubsystem  = new PhotonVisionSubsystem("Team_1", new Transform3d());
     
     private static final Command ClimbStickCommand = null;    
    
@@ -128,27 +124,27 @@ public class RobotContainer
         configureBindings();
 
         NamedCommands.registerCommand("AutoCoralLow", new   AutoScoreCoralLowCommand ( GripperSubsystem,
-                                                                                              GripperPowerOut,
-                                                                                              GripperAutoSecondsToRun));
+                                                                                                   GripperPowerOut,
+                                                                                                   GripperAutoSecondsToRun));
 
         NamedCommands.registerCommand("AutoCoralLowArm", new AutoScoreCoralLowArmCommand  ( ShoulderSubsystem,
                                                                                                         ShoulderMed,
                                                                                                         shoulderTolerance,
-                                                                                                GripperSubsystem,
-                                                                                                     GripperPowerOut,
-                                                                                                Gripper_ArmAutoSecondsToRun));                                                                                      
+                                                                                             GripperSubsystem,
+                                                                                                  GripperPowerOut,
+                                                                                                  Gripper_ArmAutoSecondsToRun));                                                                                      
       
         NamedCommands.registerCommand("AutoLoadCoral", new   AutoLoadCoralCommand ( GripperSubsystem,
                                                                                               GripperPowerIn,
                                                                                               GripperAutoSecondsToRun));
 
          NamedCommands.registerCommand("AutoScoreLevel3", new AutoScoreLevel3 ( ShoulderSubsystem,
-                                                                                                      ShoulderMed,
-                                                                                                      shoulderTolerance,
-                                                                                                GripperSubsystem,
-                                                                                                     GripperPowerOut,
-                                                                                                     Gripper_ArmAutoSecondsToRun,
-                                                                                                ElevatorSubsystem,
+                                                                                                ShoulderMed,
+                                                                                                shoulderTolerance,
+                                                                                 GripperSubsystem,
+                                                                                                GripperPowerOut,
+                                                                                                Gripper_ArmAutoSecondsToRun,
+                                                                                  ElevatorSubsystem,
                                                                                                       ElevatorPosHigh,
                                                                                                       elevatorTolerance));  
 
@@ -299,12 +295,7 @@ UpperController.rightBumper()
      new  Trigger(() -> UpperController.getLeftY() >0.5)
                                 .whileTrue( new CANdle_Blue_Command(m_Candle));
 
-                                
-
-
-                             
-
-}
+  }
     public Command getAutonomousCommand() 
     {
        return autoChooser.getSelected();

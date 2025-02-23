@@ -283,12 +283,12 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     @Override
     public void periodic()        
     {    
-       
- double rawYaw = m_Pigeon2.getYaw().getValueAsDouble();
- SmartDashboard.putNumber("RAW Pigeon Yaw", rawYaw);
+       m_Pigeon2.getYaw().refresh();
+       double rawYaw = m_Pigeon2.getYaw().getValueAsDouble();
+       SmartDashboard.putNumber("RAW Pigeon Yaw", rawYaw);
 
- double normalizedYaw = ((rawYaw + 180) % 360 + 360) % 360 - 180;
- SmartDashboard.putNumber("Pigeon Yaw", normalizedYaw);
+       double normalizedYaw = ((rawYaw + 180) % 360 + 360) % 360 - 180;
+       SmartDashboard.putNumber("Pigeon Yaw", normalizedYaw);
 
 
        if (!m_hasAppliedOperatorPerspective || DriverStation.isDisabled()) 
