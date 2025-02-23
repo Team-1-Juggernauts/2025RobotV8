@@ -19,6 +19,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     private final TalonFX m_elevator2 = new TalonFX(16);  // Follower motor
     private final CANrange range = new CANrange(17);
     private final DigitalInput DIO = new DigitalInput(0);  // Limit switch
+    private final PositionVoltage positionControl = new PositionVoltage(0);
     
 
 // PID constants
@@ -69,12 +70,17 @@ public class ElevatorSubsystem extends SubsystemBase {
          m_elevator2.setControl(new com.ctre.phoenix6.controls.Follower(15, true)); // Follower motor
     }
 
-        public void setElevatorPosition(double positionSetPoint) 
-    {
-        this.positionSetPoint = positionSetPoint;
-        PositionVoltage request = new PositionVoltage(positionSetPoint).withSlot(0);
-        m_elevator.setControl(request);  // Set control mode for the main motor
-    }
+  //      public void setElevatorPosition(double positionSetPoint) 
+  //  {
+  //      this.positionSetPoint = positionSetPoint;
+  //      PositionVoltage request = new PositionVoltage(positionSetPoint).withSlot(0);
+  //      m_elevator.setControl(request);  // Set control mode for the main motor
+  //  }
+
+  public void setElevatorPosition(double positionSetPoint) {
+    this.positionSetPoint = positionSetPoint;
+    m_elevator.setControl(positionControl.withPosition(positionSetPoint));
+}
 
     public double getPosition() {
         return m_elevator.getPosition().getValueAsDouble();
@@ -90,6 +96,11 @@ public class ElevatorSubsystem extends SubsystemBase {
         m_elevator2.setNeutralMode(NeutralModeValue.Coast);
     }
 
+    public void holdPosition() {
+        // Reapply the last known position to hold
+        m_elevator.setControl(positionControl.withPosition(positionSetPoint));
+    }
+
     @Override
     public void periodic() {
 
@@ -99,12 +110,11 @@ public class ElevatorSubsystem extends SubsystemBase {
           positionSetPoint = 0; 
         }
     
-
+        // Continuously hold position
+        m_elevator.setControl(positionControl.withPosition(positionSetPoint));
         
-        SmartDashboard.putNumber("Elevator Position", m_elevator.getPosition().getValueAsDouble());
-       
+        SmartDashboard.putNumber("Elevator Position", m_elevator.getPosition().getValueAsDouble());       
         SmartDashboard.putNumber("Elevator Setpoint", positionSetPoint);
-
         double statorCurrent = m_elevator.getStatorCurrent().getValueAsDouble();   
         SmartDashboard.putNumber("Elevator Stator Current", statorCurrent);   
         SmartDashboard.putBoolean("Elevator DIO",  DIO.get());

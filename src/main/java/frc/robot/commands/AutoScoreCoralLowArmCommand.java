@@ -16,7 +16,7 @@ public class AutoScoreCoralLowArmCommand  extends Command
   double ExecuteTimeStamp = 0.0;
   double CurrentTimeStamp = 0.0;
   double GripperPercentOut;
-  double shoulderPosOut;  
+  double targetPosition;  
   double _shoulderpos;
   boolean ShoulderDone=false;
   
@@ -24,7 +24,7 @@ public class AutoScoreCoralLowArmCommand  extends Command
   private final ShoulderSubsystem ShoulderSubsystem;
 
   public AutoScoreCoralLowArmCommand( ShoulderSubsystem ShoulderSubsystem,
-                                                          double ShoulderPosOut,
+                                                          double targetPosition,
                                       GripperSubsystem GripperSubsystem,
                                                           double GripperPowerOut,
                                                           double AutoSecondsToRun,
@@ -33,7 +33,7 @@ public class AutoScoreCoralLowArmCommand  extends Command
   {      
    
     this.ShoulderSubsystem = ShoulderSubsystem;
-    this.shoulderPosOut = shoulderPosOut;
+    this.targetPosition = targetPosition;
     this.GripperSubsystem = GripperSubsystem;
     this.GripperPercentOut = GripperPowerOut;
     this.AutoSecondsToRun = AutoSecondsToRun;
@@ -49,16 +49,17 @@ public class AutoScoreCoralLowArmCommand  extends Command
   public void initialize() 
   {
     ExecuteTimeStamp = Timer.getFPGATimestamp();
+    ShoulderSubsystem.setShoulderPosition(targetPosition);
   }
 
   @Override
   public void execute() 
   {
       
-      ShoulderSubsystem.setShoulderPosition(shoulderPosOut);
+      ShoulderSubsystem.setShoulderPosition(targetPosition);
       _shoulderpos = ShoulderSubsystem.getPosition();
 
- if (_shoulderpos > shoulderPosOut-shoulderTolerance && _shoulderpos < shoulderPosOut+shoulderTolerance)
+ if (_shoulderpos > targetPosition-shoulderTolerance && _shoulderpos < targetPosition+shoulderTolerance)
       {
          ShoulderDone=true;
         GripperSubsystem.setGripperSpeed(GripperPercentOut);
@@ -69,7 +70,7 @@ public class AutoScoreCoralLowArmCommand  extends Command
   @Override
   public void end(boolean interrupted) 
   {
-    ShoulderSubsystem.setShoulderCoast();
+    ShoulderSubsystem.setShoulderBrake();
     GripperSubsystem.setGripperSpeed(0); 
     ShoulderDone = false;
   }
@@ -80,7 +81,7 @@ public class AutoScoreCoralLowArmCommand  extends Command
   {
     if((Timer.getFPGATimestamp() -  ExecuteTimeStamp) > AutoSecondsToRun) 
     {
-      ShoulderSubsystem.setShoulderCoast();
+      ShoulderSubsystem.setShoulderBrake();
       ShoulderDone = false;
       return true;      
     } 

@@ -12,13 +12,13 @@ public class ElevatorFixedLocationCommand extends Command
 {
   
   private final ElevatorSubsystem elevatorSubsystem;
-  private final double  distance;
+  private final double  targetPosition;
   private final double elevatorTolerance;
  
-  public ElevatorFixedLocationCommand(ElevatorSubsystem elevator, Double distance, Double elevatorTolerance) 
+  public ElevatorFixedLocationCommand(ElevatorSubsystem elevator, Double targetPosition, Double elevatorTolerance) 
   {
     this.elevatorSubsystem = elevator;
-    this.distance = distance;        
+    this.targetPosition =targetPosition;        
     this.elevatorTolerance = elevatorTolerance;
     addRequirements(elevator);
   }
@@ -26,13 +26,14 @@ public class ElevatorFixedLocationCommand extends Command
   @Override
   public void initialize() 
   {
-    elevatorSubsystem.setElevatorBrake();         
+    elevatorSubsystem.setElevatorBrake();   
+    elevatorSubsystem.setElevatorPosition(targetPosition);      
   }
 
   @Override
   public void execute() 
   {          
-    elevatorSubsystem.setElevatorPosition(distance);
+    elevatorSubsystem.setElevatorPosition(targetPosition);
     SmartDashboard.putNumber("Elevator Tolerance", elevatorTolerance);
   }
 
@@ -47,9 +48,9 @@ public class ElevatorFixedLocationCommand extends Command
   public boolean isFinished() 
   {
     
-    double error = Math.abs(elevatorSubsystem.getPosition() - distance);
+    double error = Math.abs(elevatorSubsystem.getPosition() - targetPosition);
     System.out.println("Checking isFinished(): Error = " + error);
-    return error < elevatorTolerance;
+    return Math.abs(elevatorSubsystem.getPosition() - targetPosition) < elevatorTolerance;
 
     }
   }

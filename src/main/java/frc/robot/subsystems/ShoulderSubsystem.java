@@ -29,6 +29,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
   public TalonFXConfiguration configs = new TalonFXConfiguration();
   public CANcoderConfiguration cc_cfg = new CANcoderConfiguration();
   public TalonFXConfiguration fx_cfg = new TalonFXConfiguration();
+  private final PositionVoltage positionControl = new PositionVoltage(0);
     
   public  ShoulderSubsystem()
   {
@@ -75,13 +76,18 @@ m_shoulder.getConfigurator().apply(configs);
  }
    
 
- public void setShoulderPosition(double positionSetPoint)
-   {
-    
-    this.positionSetPoint = positionSetPoint;
-        PositionVoltage request = new PositionVoltage(positionSetPoint).withSlot(0);
-        m_shoulder.setControl(request);  // Set control mode for the main motor      
-   }
+ //public void setShoulderPosition(double positionSetPoint)
+//  this.positionSetPoint = positionSetPoint;
+//        PositionVoltage request = new PositionVoltage(positionSetPoint).withSlot(0);
+//        m_shoulder.setControl(request);  // Set control mode for the main motor      
+//}
+
+public void setShoulderPosition(double positionSetPoint) {
+  this.positionSetPoint = positionSetPoint;
+  m_shoulder.setControl(positionControl.withPosition(positionSetPoint));
+}
+
+
 
    public void setShoulderSpeed(double percentOutput)
    {
@@ -106,6 +112,10 @@ m_shoulder.getConfigurator().apply(configs);
    @Override
   public void periodic() 
   {  
+
+// Continuously hold position
+m_shoulder.setControl(positionControl.withPosition(positionSetPoint));
+
     double position = m_cc.getPosition().getValueAsDouble();
     double statorCurrent = m_shoulder.getStatorCurrent().getValueAsDouble();
     

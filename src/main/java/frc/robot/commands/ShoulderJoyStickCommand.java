@@ -70,7 +70,7 @@ public class ShoulderJoyStickCommand extends Command
   @Override
   public void end(boolean interrupted) 
   {
-  ShoulderSubsystem.setShoulderCoast();
+  ShoulderSubsystem.setShoulderBrake();
   }
 
   @Override
