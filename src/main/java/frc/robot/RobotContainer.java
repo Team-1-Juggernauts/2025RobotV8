@@ -40,11 +40,16 @@ import frc.robot.commands.ShoulderJoyStickCommand;
 import frc.robot.commands.WristFixedLocationCommand;
 import frc.robot.commands.ElevatorFixedLocationCommand;
 import frc.robot.commands.GripperCommand;
+import frc.robot.commands.AimAtTagCommand;
+
+import frc.robot.commands.AutoLoadCoralCommand;
 import frc.robot.commands.AutoScoreCoralLowArmCommand;
 import frc.robot.commands.AutoScoreCoralLowCommand;
+import frc.robot.commands.AutoScoreLevel3;
+import frc.robot.commands.AutoAimReefLeft;
+
 import frc.robot.commands.CANdle_Blue_Command;
-import frc.robot.commands.AutoLoadCoralCommand;
-import frc.robot.commands.AimAtTagCommand;
+
 
 import frc.robot.commands.CANdle_Yellow_Command;
 import frc.robot.commands.CANdle_Solid_White_Animation;
@@ -72,8 +77,7 @@ public class RobotContainer
     private final CommandXboxController UpperController = new CommandXboxController(1);
     private final PhotonCamera camera = new PhotonCamera("FrontCenter"); 
 
-   public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
-   private final VisionSubsystem vision = new VisionSubsystem("FrontCenter");
+  
     
     double ElevatorPosHigh = 100.0;  
     double ElevatorPosMid  = 20.0; 
@@ -97,16 +101,16 @@ public class RobotContainer
     double GripperAutoSecondsToRun = 2.0;
     double Gripper_ArmAutoSecondsToRun = 3.0;
 
-    double drivescaler;
-
     private final   CANdleSubsystem       m_Candle           = new CANdleSubsystem();
     private final   ClimbSubsystem        ClimbSubsystem     = new ClimbSubsystem();
     private final   ShoulderSubsystem     ShoulderSubsystem  = new ShoulderSubsystem();
-    //private final   VisionSubsystem photonVisionSubsystem  = new PhotonVisionSubsystem("Team_1", new Transform3d());
+   // private final   VisionSubsystem photonVisionSubsystem  = new PhotonVisionSubsystem("Team_1", new Transform3d());
     private final   Analog0Subsystem      Analog0Subsystem   = new Analog0Subsystem ();  
     public  final   ElevatorSubsystem     ElevatorSubsystem   = new ElevatorSubsystem(); 
     public  final   WristSubsystem       WristSubsystem      = new WristSubsystem();
     public final    GripperSubsystem      GripperSubsystem    = new GripperSubsystem(); 
+    public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+    private final VisionSubsystem VisionSubsystem = new VisionSubsystem("FrontCenter");
 
     
     private static final Command ClimbStickCommand = null;    
@@ -129,15 +133,27 @@ public class RobotContainer
 
         NamedCommands.registerCommand("AutoCoralLowArm", new AutoScoreCoralLowArmCommand  ( ShoulderSubsystem,
                                                                                                         ShoulderMed,
+                                                                                                        shoulderTolerance,
                                                                                                 GripperSubsystem,
                                                                                                      GripperPowerOut,
-                                                                                                Gripper_ArmAutoSecondsToRun,
-                                                                                                shoulderTolerance));                                                                                      
+                                                                                                Gripper_ArmAutoSecondsToRun));                                                                                      
       
         NamedCommands.registerCommand("AutoLoadCoral", new   AutoLoadCoralCommand ( GripperSubsystem,
                                                                                               GripperPowerIn,
                                                                                               GripperAutoSecondsToRun));
-                                                                                       
+
+         NamedCommands.registerCommand("AutoScoreLevel3", new AutoScoreLevel3 ( ShoulderSubsystem,
+                                                                                                      ShoulderMed,
+                                                                                                      shoulderTolerance,
+                                                                                                GripperSubsystem,
+                                                                                                     GripperPowerOut,
+                                                                                                     Gripper_ArmAutoSecondsToRun,
+                                                                                                ElevatorSubsystem,
+                                                                                                      ElevatorPosHigh,
+                                                                                                      elevatorTolerance));  
+
+           NamedCommands.registerCommand("AutoAimReefLeft", new AutoAimReefLeft (VisionSubsystem, 
+                                                                                            drivetrain));                                                         
     }
  
     private void configureBindings() 
@@ -146,9 +162,9 @@ public class RobotContainer
        drivetrain.setDefaultCommand        
         (
                 drivetrain.applyRequest(() ->
-                drive.withVelocityX(-joystick.getLeftY() *(1-joystick.getLeftTriggerAxis()) * MaxSpeed) // Drive forward with negative Y (forward)
-                    .withVelocityY(-joystick.getLeftX() * (1-joystick.getLeftTriggerAxis()) * MaxSpeed) // Drive left with negative X (left)
-                    .withRotationalRate(-joystick.getRightX() * (1-joystick.getLeftTriggerAxis()) * MaxAngularRate) // Drive counterclockwise with negative X (left)
+                drive.withVelocityX(-joystick.getLeftY() * Math.abs(joystick.getLeftY()) * (1-0.75 * joystick.getLeftTriggerAxis()) * MaxSpeed) // Drive forward with negative Y (forward)
+                    .withVelocityY(-joystick.getLeftX() * Math.abs(joystick.getLeftX()) * (1-0.75*joystick.getLeftTriggerAxis()) * MaxSpeed) // Drive left with negative X (left)
+                    .withRotationalRate(-joystick.getRightX() * Math.abs(joystick.getRightX())* (1-0.75*joystick.getLeftTriggerAxis()) * MaxAngularRate) // Drive counterclockwise with negative X (left)
          )
         );
 
@@ -191,7 +207,7 @@ public class RobotContainer
     //*****************************************************************/
 
     new Trigger(() -> joystick.getRightTriggerAxis() > 0.5)
-                .whileTrue(AimAtTagCommand.create(drivetrain, vision));
+                .whileTrue(AimAtTagCommand.create(drivetrain, VisionSubsystem));
 
        joystick.rightTrigger()
                           .whileTrue(new CANdle_Red_Command(m_Candle));
