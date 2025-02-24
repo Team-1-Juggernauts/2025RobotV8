@@ -9,6 +9,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -18,14 +19,17 @@ public class ElevatorSubsystem extends SubsystemBase {
     private final TalonFX m_elevator2 = new TalonFX(16);  // Follower motor
     private final DigitalInput DIO = new DigitalInput(0);  // Limit switch
     private final PositionVoltage positionControl = new PositionVoltage(0);
+    private        AnalogInput  elevatorHomeSensor = new AnalogInput(0);
     
 
 // PID constants
-    private double kP = 2.0;  // Proportional gain
+    private double kP = 0.1;  // Proportional gain
     private double kI = 0;  // Integral gain
-    private double kD = 0.2;  // Derivative gain
-    private double kS = 0.1;  // Static friction compensation
-    private double kV = 0.1;  // Velocity term for overcoming friction
+    private double kD = 0.0;  // Derivative gain
+    private double kS = 0.0;  // Static friction compensation
+    private double kV = 0.0;  // Velocity term for overcoming friction
+    private double homePosition = 0;    //This is the elevator home position
+    private double homeThreshold = 1.5;  //Analog Voltage threshold to reset home positoin
 
     private double positionSetPoint = 0.0;
     
@@ -45,13 +49,13 @@ public class ElevatorSubsystem extends SubsystemBase {
 
         var talonFXConfigurator = m_elevator.getConfigurator();        
         var limitConfigs = new CurrentLimitsConfigs();
-          limitConfigs.StatorCurrentLimit = 50;
+          limitConfigs.StatorCurrentLimit = 30;
           limitConfigs.StatorCurrentLimitEnable = true;
           talonFXConfigurator.apply(limitConfigs);
 
         var talonFXConfigurator2 = m_elevator2.getConfigurator();
         var limitConfigs2 = new CurrentLimitsConfigs();
-            limitConfigs2.StatorCurrentLimit = 50;
+            limitConfigs2.StatorCurrentLimit = 30;
             limitConfigs2.StatorCurrentLimitEnable = true;
             talonFXConfigurator2.apply(limitConfigs2);
 
@@ -102,9 +106,16 @@ public class ElevatorSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
 
+        double analogValue = elevatorHomeSensor.getVoltage();
+         if (analogValue >= homeThreshold)
+         {
+            m_elevator.setPosition(homePosition);
+            positionSetPoint = 0; 
+         }
+
         if(!DIO.get())
         {
-          m_elevator.setPosition(0);
+          m_elevator.setPosition(homePosition);
           positionSetPoint = 0; 
         }
     
@@ -113,10 +124,14 @@ public class ElevatorSubsystem extends SubsystemBase {
         
         SmartDashboard.putNumber("Elevator Position", m_elevator.getPosition().getValueAsDouble());       
         SmartDashboard.putNumber("Elevator Setpoint", positionSetPoint);
+        
         double statorCurrent = m_elevator.getStatorCurrent().getValueAsDouble();   
         SmartDashboard.putNumber("Elevator Stator Current", statorCurrent);   
         SmartDashboard.putBoolean("Elevator DIO",  DIO.get());
+        SmartDashboard.putNumber("Elevator Analog Input-0 Voltage", analogValue);
         
     }
+
+
 }
 

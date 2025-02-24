@@ -11,7 +11,7 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform3d;
+//import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -30,7 +30,6 @@ import frc.robot.subsystems.ShoulderSubsystem;
 import frc.robot.subsystems.WristSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 import frc.robot.subsystems.CANdleSubsystem;
-import frc.robot.subsystems.Analog0Subsystem;
 
 import frc.robot.commands.ClimbStickCommand;
 import frc.robot.commands.ShoulderAngleCommand;
@@ -91,16 +90,14 @@ public class RobotContainer
     double WristTolerance = 2.0;
     double WristHome = 1.0;
 
-    double   GripperPowerIn      = 0.3;   
-    double   GripperPowerOut      = -0.3;    
-    private boolean isAnalogActivated = false; 
+    double GripperPowerIn      = 0.3;   
+    double GripperPowerOut      = -0.5;    
     double GripperAutoSecondsToRun = 2.0;
     double Gripper_ArmAutoSecondsToRun = 3.0;
 
     private final   CANdleSubsystem       m_Candle               = new CANdleSubsystem();
     private final   ClimbSubsystem        ClimbSubsystem         = new ClimbSubsystem();
     private final   ShoulderSubsystem     ShoulderSubsystem      = new ShoulderSubsystem();   
-    private final   Analog0Subsystem      Analog0Subsystem       = new Analog0Subsystem ();  
     public  final   ElevatorSubsystem     ElevatorSubsystem      = new ElevatorSubsystem(); 
     public  final   WristSubsystem        WristSubsystem         = new WristSubsystem();
     public final    GripperSubsystem      GripperSubsystem       = new GripperSubsystem(); 
